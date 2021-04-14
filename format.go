@@ -183,6 +183,9 @@ func Unpack(msg []byte) (res map[int]string, err error) {
 				value := fieldConfig.Decode(stream)
 				fieldConfig.Print(value)
 				err = fieldConfig.Check(value)
+				if err != nil {
+					return
+				}
 				res[int(i)] = value
 			} else {
 				return nil, fmt.Errorf("域[%d]配置不存在", i)
