@@ -24,7 +24,7 @@ type BitConfig struct {
 }
 
 var (
-	ios8583 ios8583Def
+	ios8583 ConfigDef
 )
 
 func getAttrID(name string) (int, error) {
@@ -41,35 +41,40 @@ func getAttrID(name string) (int, error) {
 	return 0, fmt.Errorf("未知类型[%s]", name)
 }
 
-//Default 生成转换器
-func Default(cfgPath string) error {
+//NewConfig 生成8583模板
+func NewConfig(cfgPath string) (iso8583Template *ConfigDef, err error) {
 	var cfgfile BitConfig
 
 	rd, err := os.OpenFile(cfgPath, os.O_RDONLY, 0600)
 	if err != nil {
-		return err
+		return
 	}
 
 	err = yaml.NewDecoder(rd).Decode(&cfgfile)
 	if err != nil {
-		return err
+		return
 	}
-	ios8583Tmp := ios8583Def{}
+	ios8583Tmp := ConfigDef{}
 	ios8583Tmp.fieldsConfig = make(map[uint]Fielder)
 	if cfgfile.BitLen != 64 && cfgfile.BitLen != 128 {
-		return fmt.Errorf("位图长度不合法[%d]", cfgfile.BitLen)
+		err = fmt.Errorf("位图长度不合法[%d]", cfgfile.BitLen)
+		return
 	}
 	ios8583Tmp.bitLen = cfgfile.BitLen >> 3
 
 	for _, fieldCfg := range cfgfile.Fields {
-		lenAttr, err := getAttrID(fieldCfg.LenAttr)
+		var (
+			lenAttr   int
+			valueAttr int
+		)
+		lenAttr, err = getAttrID(fieldCfg.LenAttr)
 		if err != nil {
-			return err
+			return
 		}
 
-		valueAttr, err := getAttrID(fieldCfg.ValueAttr)
+		valueAttr, err = getAttrID(fieldCfg.ValueAttr)
 		if err != nil {
-			return err
+			return
 		}
 		switch fieldCfg.Type {
 		case "number":
@@ -88,14 +93,25 @@ func Default(cfgPath string) error {
 
 	}
 
-	ios8583 = ios8583Tmp
+	iso8583Template = &ios8583Tmp
+	return
+}
+
+//Default 生成转换器
+func Default(cfgPath string) error {
+
+	tlp, err := NewConfig(cfgPath)
+	if err != nil {
+		return err
+	}
+	ios8583 = *tlp
 
 	return nil
 
 }
 
 func init() {
-	ios8583 = ios8583Def{
+	ios8583 = ConfigDef{
 		bitLen: 0,
 	}
 	ios8583.fieldsConfig = make(map[uint]Fielder)

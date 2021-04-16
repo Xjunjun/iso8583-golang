@@ -1,9 +1,6 @@
 package iso8583
 
 import (
-	"bytes"
-	"fmt"
-
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
@@ -127,71 +124,12 @@ func EncodeBCD(data string, dType int, dataLen int) []byte {
 
 //Pack 8583组包
 func Pack(data map[int]string, msgType []byte) (res []byte, err error) {
-
-	var (
-		buffer bytes.Buffer
-	)
-
-	buffer.Write(msgType)
-
-	bitMap := make([]byte, ios8583.bitLen)
-
-	buffer.Write(bitMap)
-
-	filedNum := uint(ios8583.bitLen * 8)
-
-	for i := uint(2); i <= filedNum; i++ {
-		if value, ok := data[int(i)]; ok {
-			if fieldConfig, ok := ios8583.fieldsConfig[i]; ok {
-				//域配置存在
-				BitSet(&bitMap, i)
-				if i > 64 {
-					//第二位图存在
-					BitSet(&bitMap, 1)
-				}
-				fieldConfig.Print(value)
-				err = fieldConfig.Check(value)
-				if err != nil {
-					return
-				}
-				fieldConfig.Encode(&buffer, value)
-			}
-		}
-
-	}
-	res = buffer.Bytes()
-	copy(res[len(msgType):len(msgType)+len(bitMap)], bitMap)
-
+	res, err = ios8583.Pack(data, msgType)
 	return
-
 }
 
 //Unpack 8583解包,从位图开始
 func Unpack(msg []byte) (res map[int]string, err error) {
-	//获取位图
-	res = make(map[int]string)
-
-	bitMap := make([]byte, ios8583.bitLen)
-	stream := bytes.NewReader(msg)
-
-	stream.Read(bitMap)
-	filedNum := uint(ios8583.bitLen * 8)
-
-	for i := uint(2); i <= filedNum; i++ {
-		if BitExist(bitMap, i) {
-			if fieldConfig, ok := ios8583.fieldsConfig[i]; ok {
-				value := fieldConfig.Decode(stream)
-				fieldConfig.Print(value)
-				err = fieldConfig.Check(value)
-				if err != nil {
-					return
-				}
-				res[int(i)] = value
-			} else {
-				return nil, fmt.Errorf("域[%d]配置不存在", i)
-			}
-		}
-	}
+	res, err = ios8583.Unpack(msg)
 	return
-
 }
