@@ -1,0 +1,240 @@
+bit_len: 64
+
+fields:
+  - field_id: 2
+    len_attr: BCDR
+    len_width: 2
+    value_attr: BCDL
+    max: 19
+    type: number
+  
+  - field_id: 3
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 6
+    type: number
+  
+  - field_id: 4
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 12
+    type: number
+  
+  - field_id: 11
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 6
+    type: number
+  
+  - field_id: 12
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 6
+    type: number
+  
+  - field_id: 13
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 4
+    type: number
+
+  - field_id: 14
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 4
+    type: number
+
+  - field_id: 15
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 4
+    type: number
+
+  - field_id: 22
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 3
+    type: number
+  
+  - field_id: 23
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 3
+    type: number
+
+  - field_id: 25
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 2
+    type: number
+  
+  - field_id: 26
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BCDL
+    max: 2
+    type: number
+  
+  - field_id: 32
+    len_attr: BCDR
+    len_width: 2
+    value_attr: BCDL
+    max: 11
+    type: text
+  
+  - field_id: 35
+    len_attr: BCDR
+    len_width: 2
+    value_attr: BCDL
+    max: 37
+    type: track
+  
+  - field_id: 36
+    len_attr: BCDR
+    len_width: 3
+    value_attr: BCDL
+    max: 104
+    type: track
+  
+  - field_id: 37
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 12
+    type: text
+  
+  - field_id: 38
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 6
+    type: text
+  
+  - field_id: 39
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 2
+    type: text
+  
+  - field_id: 41
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 8
+    type: text
+  
+  - field_id: 42
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 15
+    type: text
+
+  - field_id: 44
+    len_attr: BCDR
+    len_width: 2
+    value_attr: NORMAL
+    max: 25
+    type: text
+  
+  - field_id: 46
+    len_attr: BCDR
+    len_width: 3
+    value_attr: NORMAL
+    max: 512
+    type: text
+  
+  - field_id: 48
+    len_attr: BCDR
+    len_width: 3
+    value_attr: BCDL
+    max: 512
+    type: text
+  
+  - field_id: 49
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 3
+    type: number
+  
+  - field_id: 52
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BITS
+    max: 8
+    type: binary
+  
+  - field_id: 53
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: NORMAL
+    max: 16
+    type: text
+  
+  - field_id: 54
+    len_attr: BCDR
+    len_width: 3
+    value_attr: NORMAL
+    max: 20
+    type: text
+  
+  - field_id: 55
+    len_attr: BCDR
+    len_width: 3
+    value_attr: BITS
+    max: 255
+    type: binary
+  
+  - field_id: 58
+    len_attr: BCDR
+    len_width: 3
+    value_attr: NORMAL
+    max: 100
+    type: text
+  
+  - field_id: 60
+    len_attr: BCDR
+    len_width: 3
+    value_attr: BCDL
+    max: 13
+    type: number
+  
+  - field_id: 61
+    len_attr: BCDR
+    len_width: 3
+    value_attr: BCDL
+    max: 29
+    type: number
+  
+  - field_id: 62
+    len_attr: BCDR
+    len_width: 3
+    value_attr: NORMAL
+    max: 512
+    type: text
+  
+  - field_id: 63
+    len_attr: BCDR
+    len_width: 3
+    value_attr: BITS
+    max: 999
+    type: binary
+  
+  - field_id: 64
+    len_attr: NORMAL
+    len_width: 0
+    value_attr: BITS
+    max: 8
+    type: binary
