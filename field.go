@@ -58,22 +58,24 @@ func (fd *fieldDef) Encode(bf *bytes.Buffer, value string) {
 		sLen    string
 		data    []byte
 	)
+
+	gbkValue := EncodeGBK(value)
 	if fd.lenWidth > 0 {
-		dataLen = len(value)
+		dataLen = len(gbkValue)
 	} else {
 		dataLen = fd.max
 	}
 
 	switch fd.valueAttr {
 	case NORMAL:
-		data = EncodeGBK(value)
+		data = gbkValue
 	case BCDL, BCDR:
 		data = EncodeBCD(value, fd.valueAttr, (dataLen+1)/2)
 	case BITS:
 		dataLen = dataLen / 2
 		data = Str2Hex([]byte(value))
 	default:
-		data = EncodeGBK(value)
+		data = gbkValue
 	}
 
 	if fd.lenWidth > 0 {
