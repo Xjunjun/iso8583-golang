@@ -179,7 +179,7 @@ fields:
   - field_id: 53
     len_attr: NORMAL
     len_width: 0
-    value_attr: NORMAL
+    value_attr: BCDR
     max: 16
     type: text
   
