@@ -3,6 +3,7 @@ package iso8583
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 )
@@ -42,18 +43,22 @@ func getAttrID(name string) (int, error) {
 }
 
 //NewConfig 生成8583模板
-func NewConfig(cfgPath string) (iso8583Template *ConfigDef, err error) {
+func NewConfig(input string) (iso8583Template *ConfigDef, err error) {
 	var cfgfile BitConfig
 
-	rd, err := os.OpenFile(cfgPath, os.O_RDONLY, 0600)
+	rd, err := os.OpenFile(input, os.O_RDONLY, 0600)
+	if err == nil {
+		defer rd.Close()
+		err = yaml.NewDecoder(rd).Decode(&cfgfile)
+	} else {
+		//作为字符串处理
+		stream := strings.NewReader(input)
+		err = yaml.NewDecoder(stream).Decode(&cfgfile)
+	}
 	if err != nil {
 		return
 	}
 
-	err = yaml.NewDecoder(rd).Decode(&cfgfile)
-	if err != nil {
-		return
-	}
 	ios8583Tmp := ConfigDef{}
 	ios8583Tmp.fieldsConfig = make(map[uint]Fielder)
 	if cfgfile.BitLen != 64 && cfgfile.BitLen != 128 {
