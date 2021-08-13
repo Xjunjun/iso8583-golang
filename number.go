@@ -35,9 +35,11 @@ func (nd *NumField) Check(value string) error {
 	}
 
 	//检查域是否都是数字
-	result, _ := regexp.MatchString("^\\d+$", value)
-	if result == false {
-		return fmt.Errorf("%s:域值非数字[%s]", nd.Name(), value)
+	if len(value) > 0 {
+		result, _ := regexp.MatchString("^\\d+$", value)
+		if result == false {
+			return fmt.Errorf("%s:域值非数字[%s]", nd.Name(), value)
+		}
 	}
 
 	return nil
