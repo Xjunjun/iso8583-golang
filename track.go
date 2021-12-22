@@ -28,14 +28,14 @@ func NewTrackField(fieldID int, lenAttr int, lenWidth int, valueAttr int, max in
 }
 
 //Encode 组包
-func (td *TrackField) Encode(bf *bytes.Buffer, value string) {
+func (td *TrackField) Encode(bf *bytes.Buffer, value string) int {
 	var trackData string
 	if td.valueAttr == BCDL || td.valueAttr == BCDR {
 		//磁道信息bcd压缩时,需要将=转换为D
 		trackData = strings.ReplaceAll(value, "=", "D")
 	}
 
-	td.fieldDef.Encode(bf, trackData)
+	return td.fieldDef.Encode(bf, trackData)
 }
 
 /****************************

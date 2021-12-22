@@ -29,7 +29,7 @@ func Test8583PosMsg(t *testing.T) {
 	iso8583.SetLogger(&LogUser{t})
 
 	iso8583Data := make(map[int]string)
-
+	iso8583Data[0] = "0200"
 	iso8583Data[2] = "6212142400000000105"
 	iso8583Data[3] = "000000"
 	iso8583Data[4] = "000000510000"
@@ -49,14 +49,14 @@ func Test8583PosMsg(t *testing.T) {
 	iso8583Data[60] = "220000020006"
 	iso8583Data[64] = "3541314239313946"
 
-	out2, err := iso8583.Pack(iso8583Data, iso8583.Str2Hex([]byte("0200")))
+	out2, err := iso8583.Pack(iso8583Data)
 	if err != nil {
 		t.Log(err)
 		return
 	}
 	t.Log("报文:", iso8583.Hex2Str(out2))
 
-	unpack2, err := iso8583.Unpack(out2[2:])
+	unpack2, err := iso8583.Unpack(out2)
 	if err != nil {
 		t.Log(err)
 		return
@@ -80,7 +80,7 @@ func Test8583InsMsg(t *testing.T) {
 	iso8583.SetLogger(&LogUser{t})
 
 	iso8583Data := make(map[int]string)
-
+	iso8583Data[0] = "0420"
 	iso8583Data[2] = "6212142400000000105"
 	iso8583Data[3] = "000000"
 	iso8583Data[4] = "000000510000"
@@ -105,14 +105,14 @@ func Test8583InsMsg(t *testing.T) {
 	iso8583Data[60] = "000005"
 	iso8583Data[128] = "3541314239313946"
 
-	out2, err := config.Pack(iso8583Data, []byte("0200"))
+	out2, err := config.Pack(iso8583Data)
 	if err != nil {
 		t.Log(err)
 		return
 	}
 	t.Log("报文:", iso8583.Hex2Str(out2))
 
-	unpack2, err := config.Unpack(out2[4:])
+	unpack2, err := config.Unpack(out2)
 	if err != nil {
 		t.Log(err)
 		return

@@ -20,8 +20,9 @@ type FieldCfg struct {
 
 //BitConfig 域配置信息
 type BitConfig struct {
-	BitLen int        `yaml:"bit_len"` //位图长度
-	Fields []FieldCfg `yaml:"fields"`  //域配置
+	BitLen  int        `yaml:"bit_len"`  //位图长度
+	MsgType FieldCfg   `yaml:"msg_type"` //报文类型
+	Fields  []FieldCfg `yaml:"fields"`   //域配置
 }
 
 var (
@@ -40,6 +41,35 @@ func getAttrID(name string) (int, error) {
 		return BITS, nil
 	}
 	return 0, fmt.Errorf("未知类型[%s]", name)
+}
+
+// 设置域配置
+func newField(cfg FieldCfg) (f Fielder, err error) {
+	var (
+		lenAttr   int
+		valueAttr int
+	)
+	lenAttr, err = getAttrID(cfg.LenAttr)
+	if err != nil {
+		return
+	}
+
+	valueAttr, err = getAttrID(cfg.ValueAttr)
+	if err != nil {
+		return
+	}
+	switch cfg.Type {
+	case "number":
+		f = NewNumField(cfg.FieldID, lenAttr, cfg.LenWidth, valueAttr, cfg.Max)
+	case "binary":
+
+		f = NewBinField(cfg.FieldID, lenAttr, cfg.LenWidth, valueAttr, cfg.Max)
+	case "track":
+		f = NewTrackField(cfg.FieldID, lenAttr, cfg.LenWidth, valueAttr, cfg.Max)
+	default:
+		f = NewTextField(cfg.FieldID, lenAttr, cfg.LenWidth, valueAttr, cfg.Max)
+	}
+	return
 }
 
 //NewConfig 生成8583模板
@@ -67,38 +97,22 @@ func NewConfig(input string) (iso8583Template *ConfigDef, err error) {
 	}
 	ios8583Tmp.bitLen = cfgfile.BitLen >> 3
 
+	//是否存在0域 报文类型
+	if cfgfile.MsgType.Max > 0 {
+		fieldCfg := cfgfile.MsgType
+		if ios8583Tmp.msgTypeConfig, err = newField(fieldCfg); err != nil {
+			return
+		}
+	}
+
 	for _, fieldCfg := range cfgfile.Fields {
-		var (
-			lenAttr   int
-			valueAttr int
-		)
-		lenAttr, err = getAttrID(fieldCfg.LenAttr)
-		if err != nil {
+		if ios8583Tmp.fieldsConfig[uint(fieldCfg.FieldID)], err = newField(fieldCfg); err != nil {
 			return
 		}
-
-		valueAttr, err = getAttrID(fieldCfg.ValueAttr)
-		if err != nil {
-			return
-		}
-		switch fieldCfg.Type {
-		case "number":
-			ios8583Tmp.fieldsConfig[uint(fieldCfg.FieldID)] =
-				NewNumField(fieldCfg.FieldID, lenAttr, fieldCfg.LenWidth, valueAttr, fieldCfg.Max)
-		case "binary":
-			ios8583Tmp.fieldsConfig[uint(fieldCfg.FieldID)] =
-				NewBinField(fieldCfg.FieldID, lenAttr, fieldCfg.LenWidth, valueAttr, fieldCfg.Max)
-		case "track":
-			ios8583Tmp.fieldsConfig[uint(fieldCfg.FieldID)] =
-				NewTrackField(fieldCfg.FieldID, lenAttr, fieldCfg.LenWidth, valueAttr, fieldCfg.Max)
-		default:
-			ios8583Tmp.fieldsConfig[uint(fieldCfg.FieldID)] =
-				NewTextField(fieldCfg.FieldID, lenAttr, fieldCfg.LenWidth, valueAttr, fieldCfg.Max)
-		}
-
 	}
 
 	iso8583Template = &ios8583Tmp
+
 	return
 }
 

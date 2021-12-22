@@ -2,6 +2,7 @@ package iso8583
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -52,7 +53,8 @@ func (fd *fieldDef) Check(value string) error {
 }
 
 //Encode 组包
-func (fd *fieldDef) Encode(bf *bytes.Buffer, value string) {
+func (fd *fieldDef) Encode(bf *bytes.Buffer, value string) int {
+	start := bf.Len()
 	var (
 		dataLen int
 		sLen    string
@@ -89,7 +91,7 @@ func (fd *fieldDef) Encode(bf *bytes.Buffer, value string) {
 	}
 
 	bf.Write(data)
-
+	return bf.Len() - start
 }
 
 //Decode 解包
@@ -146,27 +148,43 @@ func (fd *fieldDef) Print(value string) {
 
 //Fielder 域属性
 type Fielder interface {
-	Check(value string) error              //域检查
-	Encode(bf *bytes.Buffer, value string) //域组包
-	Decode(br *bytes.Reader) string        //域解包
-	Name() string                          //域名称
-	Print(value string)                    //打印
+	Check(value string) error                  //域检查
+	Encode(bf *bytes.Buffer, value string) int //域组包
+	Decode(br *bytes.Reader) string            //域解包
+	Name() string                              //域名称
+	Print(value string)                        //打印
 }
 
 //ConfigDef 8583报文结构定义
 type ConfigDef struct {
-	bitLen       int
-	fieldsConfig map[uint]Fielder
+	bitLen        int
+	msgTypeConfig Fielder
+	fieldsConfig  map[uint]Fielder
 }
 
 //Pack 8583组包
-func (iso *ConfigDef) Pack(data map[int]string, msgType []byte) (res []byte, err error) {
+func (iso *ConfigDef) Pack(data map[int]string) (res []byte, err error) {
 
 	var (
-		buffer bytes.Buffer
+		buffer     bytes.Buffer
+		msgTypeLen int
 	)
 
-	buffer.Write(msgType)
+	if iso.msgTypeConfig != nil {
+		// 存在报文头 取0域进行赋值
+		if value, ok := data[0]; ok {
+			iso.msgTypeConfig.Print(value)
+			err = iso.msgTypeConfig.Check(value)
+			if err != nil {
+				return
+			}
+			msgTypeLen = iso.msgTypeConfig.Encode(&buffer, value)
+		} else {
+			err = errors.New("缺失报文类型")
+			log.Info(err)
+			return
+		}
+	}
 
 	bitMap := make([]byte, iso.bitLen)
 
@@ -194,7 +212,7 @@ func (iso *ConfigDef) Pack(data map[int]string, msgType []byte) (res []byte, err
 
 	}
 	res = buffer.Bytes()
-	copy(res[len(msgType):len(msgType)+len(bitMap)], bitMap)
+	copy(res[msgTypeLen:msgTypeLen+len(bitMap)], bitMap)
 
 	return
 
@@ -204,9 +222,20 @@ func (iso *ConfigDef) Pack(data map[int]string, msgType []byte) (res []byte, err
 func (iso *ConfigDef) Unpack(msg []byte) (res map[int]string, err error) {
 	//获取位图
 	res = make(map[int]string)
+	stream := bytes.NewReader(msg)
+
+	if iso.msgTypeConfig != nil {
+		//存在报文类型
+		value := iso.msgTypeConfig.Decode(stream)
+		iso.msgTypeConfig.Print(value)
+		if err != nil {
+			log.Info("解析报文类型失败", err)
+			return
+		}
+		res[0] = value
+	}
 
 	bitMap := make([]byte, iso.bitLen)
-	stream := bytes.NewReader(msg)
 
 	stream.Read(bitMap)
 	filedNum := uint(iso.bitLen * 8)

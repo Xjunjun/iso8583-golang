@@ -123,8 +123,8 @@ func EncodeBCD(data string, dType int, dataLen int) []byte {
 }
 
 //Pack 8583组包
-func Pack(data map[int]string, msgType []byte) (res []byte, err error) {
-	res, err = ios8583.Pack(data, msgType)
+func Pack(data map[int]string) (res []byte, err error) {
+	res, err = ios8583.Pack(data)
 	return
 }
 

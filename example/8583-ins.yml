@@ -1,5 +1,12 @@
 bit_len: 128
 
+msg_type:
+  len_attr: NORMAL
+  len_width: 0
+  value_attr: NORMAL
+  max: 4
+  type: number
+
 fields:
   - field_id: 2
     len_attr: NORMAL
