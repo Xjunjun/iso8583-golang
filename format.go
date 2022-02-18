@@ -128,8 +128,8 @@ func Pack(data map[int]string) (res []byte, err error) {
 	return
 }
 
-//Unpack 8583解包,从位图开始
-func Unpack(msg []byte) (res map[int]string, err error) {
-	res, err = ios8583.Unpack(msg)
+//Unpack 8583解包,从报文头开始
+func Unpack(msg []byte) (res map[int]string, msgLen int, err error) {
+	res, msgLen, err = ios8583.Unpack(msg)
 	return
 }

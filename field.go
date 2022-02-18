@@ -218,8 +218,8 @@ func (iso *ConfigDef) Pack(data map[int]string) (res []byte, err error) {
 
 }
 
-//Unpack 8583解包,从位图开始
-func (iso *ConfigDef) Unpack(msg []byte) (res map[int]string, err error) {
+//Unpack 8583解包,从报文头开始
+func (iso *ConfigDef) Unpack(msg []byte) (res map[int]string, msgLen int, err error) {
 	//获取位图
 	res = make(map[int]string)
 	stream := bytes.NewReader(msg)
@@ -251,10 +251,12 @@ func (iso *ConfigDef) Unpack(msg []byte) (res map[int]string, err error) {
 				}
 				res[int(i)] = value
 			} else {
-				return nil, fmt.Errorf("域[%d]配置不存在", i)
+				return nil, 0, fmt.Errorf("域[%d]配置不存在", i)
 			}
 		}
 	}
-	return
 
+	msgLen = int(stream.Size()) - stream.Len() //8583报文体长度
+
+	return
 }

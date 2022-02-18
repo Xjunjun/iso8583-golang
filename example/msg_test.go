@@ -56,11 +56,13 @@ func Test8583PosMsg(t *testing.T) {
 	}
 	t.Log("报文:", iso8583.Hex2Str(out2))
 
-	unpack2, err := iso8583.Unpack(out2)
+	out2 = append(out2, []byte("1234567890")...)
+	unpack2, msgLen, err := iso8583.Unpack(out2)
 	if err != nil {
 		t.Log(err)
 		return
 	}
+	t.Log(msgLen)
 
 	for i := 0; i < 128; i++ {
 		if value, ok := unpack2[i]; ok {
@@ -112,7 +114,7 @@ func Test8583InsMsg(t *testing.T) {
 	}
 	t.Log("报文:", iso8583.Hex2Str(out2))
 
-	unpack2, err := config.Unpack(out2)
+	unpack2, _, err := config.Unpack(out2)
 	if err != nil {
 		t.Log(err)
 		return
