@@ -18,7 +18,7 @@ const (
 	BITS
 )
 
-//fieldDef  域定义
+// fieldDef  域定义
 type fieldDef struct {
 	fieldID   int    //域id
 	lenAttr   int    //长度属性
@@ -32,12 +32,12 @@ func (fd *fieldDef) SetName() {
 	fd.name = fmt.Sprintf("BID[%03d]", fd.fieldID)
 }
 
-//Name 域名称
+// Name 域名称
 func (fd *fieldDef) Name() string {
 	return fd.name
 }
 
-//Check 域检查
+// Check 域检查
 func (fd *fieldDef) Check(value string) error {
 	v := EncodeGBK(value)
 	//检查域长度
@@ -52,7 +52,7 @@ func (fd *fieldDef) Check(value string) error {
 	return nil
 }
 
-//Encode 组包
+// Encode 组包
 func (fd *fieldDef) Encode(bf *bytes.Buffer, value string) int {
 	start := bf.Len()
 	var (
@@ -94,7 +94,7 @@ func (fd *fieldDef) Encode(bf *bytes.Buffer, value string) int {
 	return bf.Len() - start
 }
 
-//Decode 解包
+// Decode 解包
 func (fd *fieldDef) Decode(br *bytes.Reader) string {
 	var (
 		realLen int //真实长度
@@ -132,10 +132,10 @@ func (fd *fieldDef) Decode(br *bytes.Reader) string {
 
 }
 
-//Print 打印域信息
+// Print 打印域信息
 func (fd *fieldDef) Print(value string) {
 	if fd.lenWidth > 0 {
-		vl := len(value)
+		vl := len(EncodeGBK(value))
 		if fd.valueAttr == BITS {
 			vl /= 2
 		}
@@ -146,7 +146,7 @@ func (fd *fieldDef) Print(value string) {
 	}
 }
 
-//Fielder 域属性
+// Fielder 域属性
 type Fielder interface {
 	Check(value string) error                  //域检查
 	Encode(bf *bytes.Buffer, value string) int //域组包
@@ -155,14 +155,14 @@ type Fielder interface {
 	Print(value string)                        //打印
 }
 
-//ConfigDef 8583报文结构定义
+// ConfigDef 8583报文结构定义
 type ConfigDef struct {
 	bitLen        int
 	msgTypeConfig Fielder
 	fieldsConfig  map[uint]Fielder
 }
 
-//Pack 8583组包
+// Pack 8583组包
 func (iso *ConfigDef) Pack(data map[int]string) (res []byte, err error) {
 
 	var (
@@ -218,7 +218,7 @@ func (iso *ConfigDef) Pack(data map[int]string) (res []byte, err error) {
 
 }
 
-//Unpack 8583解包,从报文头开始
+// Unpack 8583解包,从报文头开始
 func (iso *ConfigDef) Unpack(msg []byte) (res map[int]string, msgLen int, err error) {
 	//获取位图
 	res = make(map[int]string)
@@ -228,10 +228,6 @@ func (iso *ConfigDef) Unpack(msg []byte) (res map[int]string, msgLen int, err er
 		//存在报文类型
 		value := iso.msgTypeConfig.Decode(stream)
 		iso.msgTypeConfig.Print(value)
-		if err != nil {
-			log.Info("解析报文类型失败", err)
-			return
-		}
 		res[0] = value
 	}
 
